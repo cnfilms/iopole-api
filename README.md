@@ -5,7 +5,11 @@
 ### How to use 🔧
     
     from iopoleapi.client import IopoleAPI
-    api = IopoleAPI()
+    
+    api = IopoleAPI(client_id='YOUR_CLIENT_ID',
+                    client_secret='YOUR_CLIENT_SECRET',
+                    base_url='IOPOLE_BASE_URL',
+                    auth_url='IOPOLE_AUTH_URL')
     api.auth()
 
     # Send invoices
