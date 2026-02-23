@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iopole-api"
+version = "0.1.0"
+description = "Connector for Iopole API"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name="Grégoire Nowacki", email="gregoire.nowacki@cinego.net" }
+]
+
+dependencies = ["requests"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["iopoleapi*"]
