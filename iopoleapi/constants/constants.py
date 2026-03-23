@@ -1,1 +1,19 @@
+from enum import IntEnum
+
 HTTP_ERRORS = [400, 401, 403, 404, 409]
+
+class IopoleStatus(IntEnum):
+    SUBMITTED = 200
+    ISSUED = 201
+    RECEIVED = 202
+    MADE_AVAILABLE = 203
+    IN_HAND = 204
+    APPROVED = 205
+    PARTIALLY_APPROVED = 206
+    DISPUTED = 207
+    SUSPENDED = 208
+    COMPLETED = 209
+    REFUSED = 210
+    PAYMENT_SENT = 211
+    PAYMENT_RECEIVED = 212
+    REJECTED = 213
