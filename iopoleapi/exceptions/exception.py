@@ -1,5 +1,6 @@
 # TODO: Less generic error handling
 
+
 class IopoleApiException(Exception):
     ERROR_MESSAGES = {
         400: "Request validation failure",

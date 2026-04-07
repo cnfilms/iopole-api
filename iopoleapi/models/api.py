@@ -5,7 +5,7 @@ import requests
 from iopoleapi.exceptions.exception import IopoleApiException
 
 
-class API():
+class API:
     def __init__(self, client_id, client_secret, base_url, auth_url):
         self.client_id = client_id
         self.client_secret = client_secret
@@ -23,9 +23,7 @@ class API():
                 "client_secret": self.client_secret,
             }
 
-            headers = {
-                "Content-Type": "application/x-www-form-urlencoded"
-            }
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
             response = requests.post(self.auth_url, data=data, headers=headers)
             if response.status_code != 200:
@@ -34,7 +32,8 @@ class API():
             token_data = response.json()
             self.token = token_data.get("access_token")
             self.token_expiration_date = datetime.datetime.now() + datetime.timedelta(
-                seconds=token_data.get('expires_in', 0))
+                seconds=token_data.get("expires_in", 0)
+            )
 
         return self.token
 
@@ -43,9 +42,9 @@ class API():
             raise IopoleApiException("Pas de token, merci de vous authentifier.")
 
         return {
-            'customer-id': f"{self.client_id}",
-            'Authorization': f'Bearer {self.token}',
-            'accept': 'application/json'
+            "customer-id": f"{self.client_id}",
+            "Authorization": f"Bearer {self.token}",
+            "accept": "application/json",
         }
 
     def is_token_expired(self):

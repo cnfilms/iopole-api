@@ -4,9 +4,15 @@ from iopoleapi.exceptions.exception import IopoleApiException
 
 from iopoleapi.models.api import API
 
+
 class Enrollment(API):
     def __init__(self, client_id, client_secret, base_url, auth_url):
-        super().__init__(client_id=client_id, client_secret=client_secret, base_url=base_url, auth_url=auth_url)
+        super().__init__(
+            client_id=client_id,
+            client_secret=client_secret,
+            base_url=base_url,
+            auth_url=auth_url,
+        )
 
     def get_enrollment_link(self, siren) -> str:
         """
@@ -15,10 +21,12 @@ class Enrollment(API):
         headers = self.make_headers()
         url = f"{self.base_url}/config/french/enrollment"
 
-        response = requests.put(url, headers=headers, json={"siren":str(siren)})
+        response = requests.put(url, headers=headers, json={"siren": str(siren)})
 
         if response.status_code == 400:
-            raise IopoleApiException('Tu ne peux pas faire ça.')
-        onboarding_link = json.loads(response.content.decode('utf-8')).get('onboardingUrl')
+            raise IopoleApiException(response.status_code, "Tu ne peux pas faire ça.")
+        onboarding_link = json.loads(response.content.decode("utf-8")).get(
+            "onboardingUrl"
+        )
 
         return onboarding_link

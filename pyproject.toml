@@ -1,19 +1,27 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "iopole-api"
 version = "0.1.1"
 description = "Connector for Iopole API"
+keywords = ["iopole", "factur-x"]
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
-    { name="Grégoire Nowacki", email="gregoire.nowacki@cinego.net" }
+    { name = "CNFilms", email = "technique@cinego.net" }
 ]
 
-dependencies = ["requests"]
+dependencies = ["requests>=2.25"]
+
+[build-system]
+requires = ["setuptools<82"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["iopoleapi*"]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "ruff>=0.15.9",
+    "types-requests>=2.32.4.20260107",
+]

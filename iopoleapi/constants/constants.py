@@ -2,6 +2,7 @@ from enum import IntEnum
 
 HTTP_ERRORS = [400, 401, 403, 404, 409]
 
+
 class IopoleStatus(IntEnum):
     SUBMITTED = 200
     ISSUED = 201
