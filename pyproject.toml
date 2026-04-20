@@ -1,6 +1,6 @@
 [project]
 name = "iopole-api"
-version = "0.1.1"
+version = "0.1.2"
 description = "Connector for Iopole API"
 keywords = ["iopole", "factur-x"]
 readme = "README.md"
@@ -19,9 +19,23 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 include = ["iopoleapi*"]
 
+[tool.setuptools.package-data]
+iopoleapi = ["py.typed"]
+
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
     "ruff>=0.15.9",
     "types-requests>=2.32.4.20260107",
 ]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+files = ["iopoleapi"]
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

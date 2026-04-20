@@ -1,28 +1,44 @@
-import json
+from __future__ import annotations
+
+from typing import Any
+from urllib.parse import urlencode
 
 import requests
 
+from iopoleapi.exceptions.exception import IopoleApiException
 from iopoleapi.models.api import API
 
 
 class Societe(API):
-    def __init__(self, client_id, client_secret, base_url, auth_url):
-        super().__init__(
-            client_id=client_id,
-            client_secret=client_secret,
-            base_url=base_url,
-            auth_url=auth_url,
-        )
+    def get_electronic_addresses(self, siren: str) -> list[Any]:
+        """Return the electronic (Peppol) addresses registered for a company.
 
-    def get_electronic_addresses(self, siren) -> list:
-        """
-        Get a society's electronic addresses from its SIREN
+        Args:
+            siren: The 9-digit French company identifier (SIREN).
+
+        Returns:
+            A list of identifier objects, or an empty list when none are found.
+
+        Raises:
+            IopoleApiException: on any HTTP error response.
         """
         headers = self.make_headers()
-        url = f"{self.base_url}/directory/french?q=siren%3A%22{siren}%22"
+        query = urlencode({"q": f'siren:"{siren}"'})
+        url = f"{self.base_url}/directory/french?{query}"
 
-        response = json.loads(requests.get(url, headers=headers).text).get("data")
+        response = requests.get(url, headers=headers)
 
-        if isinstance(response, list) and len(response):
-            return response[0].get("identifiers")
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise IopoleApiException(
+                response.status_code,
+                "Could not retrieve electronic addresses from Iopole",
+            ) from e
+
+        payload: dict[str, Any] = response.json()
+        data: list[Any] = payload.get("data", [])
+        if data:
+            identifiers: list[Any] = data[0].get("identifiers", [])
+            return identifiers
         return []

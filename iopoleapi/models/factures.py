@@ -1,69 +1,92 @@
-import json
+from __future__ import annotations
+
+from typing import Any
+
 import requests
 
-from iopoleapi.constants.constants import HTTP_ERRORS
 from iopoleapi.exceptions.exception import IopoleApiException
 from iopoleapi.models.api import API
 
 
 class Factures(API):
-    def __init__(self, client_id, client_secret, base_url, auth_url):
-        super().__init__(
-            client_id=client_id,
-            client_secret=client_secret,
-            base_url=base_url,
-            auth_url=auth_url,
-        )
+    def send_invoice(self, path: str) -> str:
+        """Send an invoice file to Iopole.
 
-    def send_invoice(self, path) -> str:
-        """
-        Send an invoice.
+        Args:
+            path: Filesystem path to the invoice PDF.
+
+        Returns:
+            The Iopole invoice ID assigned to the uploaded file.
+
+        Raises:
+            IopoleApiException: on any HTTP error response.
         """
         headers = self.make_headers()
-        invoice = {"file": open(path, "rb")}
         url = f"{self.base_url}/invoice"
 
-        response = requests.post(url, headers=headers, files=invoice)
-        if response.status_code in HTTP_ERRORS:
+        with open(path, "rb") as invoice:
+            response = requests.post(url, headers=headers, files={"file": invoice})
+
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
             raise IopoleApiException(
-                response.status_code, "The invoice was not sent to Iopole"
-            )
+                response.status_code, "The invoice was not sent to Iopole."
+            ) from e
 
-        invoice_id = json.loads(response.content.decode("utf-8")).get("id")
-
+        invoice_id: str = response.json()["id"]
         return invoice_id
 
-    def get_invoice(self, invoice_id) -> bytes:
-        """
-        Get an invoice from its invoice id.
+    def get_invoice(self, invoice_id: str) -> bytes:
+        """Download the original invoice file.
+
+        Args:
+            invoice_id: The Iopole invoice ID.
+
+        Returns:
+            Raw bytes of the invoice file.
+
+        Raises:
+            IopoleApiException: on any HTTP error response.
         """
         headers = self.make_headers()
         url = f"{self.base_url}/invoice/{invoice_id}/download"
 
         response = requests.get(url, headers=headers)
-        if response.status_code in HTTP_ERRORS:
+
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
             raise IopoleApiException(
-                response.status_code, "The invoice was not received from Iopole"
-            )
+                response.status_code, "The invoice couldn't be retrieved from Iopole."
+            ) from e
 
-        invoice = response.content
+        return response.content
 
-        return invoice
+    def get_invoice_metadata(self, invoice_id: str) -> list[Any]:
+        """Retrieve metadata for an invoice.
 
-    def get_invoice_metadata(self, invoice_id) -> list:
-        """
-        Get an invoice's metadata from its invoice id.
+        Args:
+            invoice_id: The Iopole invoice ID.
+
+        Returns:
+            List of metadata objects returned by the API.
+
+        Raises:
+            IopoleApiException: on any HTTP error response.
         """
         headers = self.make_headers()
         url = f"{self.base_url}/invoice/{invoice_id}/files"
 
         response = requests.get(url, headers=headers)
-        if response.status_code in HTTP_ERRORS:
+
+        try:
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as e:
             raise IopoleApiException(
                 response.status_code,
-                "The invoice's metadata was not received from Iopole",
-            )
+                "The invoice's metadata couldn't be retrieved from Iopole.",
+            ) from e
 
-        metadata = json.loads(response.content.decode("utf-8"))
-
-        return metadata
+        result: list[Any] = response.json()
+        return result
