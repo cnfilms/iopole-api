@@ -1,9 +1,10 @@
 from iopoleapi.models.enrollment import Enrollment
+from iopoleapi.models.ereporting import Ereporting
 from iopoleapi.models.factures import Factures
 from iopoleapi.models.societe import Societe
 
 
-class IopoleAPI(Factures, Enrollment, Societe):
+class IopoleAPI(Factures, Enrollment, Societe, Ereporting):
     """Iopole API client.
 
     Combines invoice management (Factures), company enrollment (Enrollment),
