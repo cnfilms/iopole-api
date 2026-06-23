@@ -61,7 +61,6 @@ class API:
             "customer-id": self.client_id,
             "Authorization": f"Bearer {self.token}",
             "accept": "*/*",
-            "Content-Type": "application/json",
         }
 
     def is_token_expired(self) -> bool:
