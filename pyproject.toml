@@ -1,6 +1,6 @@
 [project]
 name = "iopole-api"
-version = "0.1.2"
+version = "0.1.3"
 description = "Connector for Iopole API"
 keywords = ["iopole", "factur-x"]
 readme = "README.md"
