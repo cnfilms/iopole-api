@@ -9,7 +9,9 @@ from iopoleapi.models.api import API
 
 
 class Status(API):
-    def send_invoice_payment_status(self, uuid_presta: str, amount: float, vat_rate: float = 0.0) -> None:
+    def send_invoice_payment_status(
+        self, uuid_presta: str, amount: float, vat_rate: float = 0.0
+    ) -> None:
         """Send PAYMENT_SENT status to Iopole for an invoice.
 
         This endpoint notifies Iopole that an invoice has been paid (encaissée).
