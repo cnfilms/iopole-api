@@ -14,16 +14,22 @@ class API:
         client_secret: str,
         base_url: str,
         auth_url: str,
+        token: str | None = None,
+        token_expiration_date: datetime.datetime | None = None,
     ) -> None:
         self.client_id = client_id
         self.client_secret = client_secret
         self.base_url = base_url.rstrip("/")
         self.auth_url = auth_url
-        self.token: str | None = None
-        self.token_expiration_date: datetime.datetime | None = None
+        self.token = token
+        self.token_expiration_date = token_expiration_date
 
-    def auth(self) -> str:
-        """Obtain (or reuse) a valid OAuth2 client-credentials token."""
+    def auth(self) -> tuple[str, datetime.datetime]:
+        """Obtain (or reuse) a valid OAuth2 client-credentials token.
+        
+        Returns:
+            tuple: (access_token, token_expiration_date)
+        """
         if self.is_token_expired():
             data = {
                 "grant_type": "client_credentials",
@@ -43,8 +49,8 @@ class API:
                 seconds=float(expires_in)  # type: ignore[arg-type]
             )
 
-        assert self.token is not None
-        return self.token
+        assert self.token is not None and self.token_expiration_date is not None
+        return self.token, self.token_expiration_date
 
     def make_headers(self) -> dict[str, str]:
         """Build the HTTP headers required for authenticated API calls.
