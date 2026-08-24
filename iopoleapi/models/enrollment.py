@@ -20,11 +20,11 @@ class Enrollment(API):
         headers = self.make_headers()
         url = f"{self.base_url}/config/french/enrollment"
 
-        response = requests.put(url, headers=headers, json={
-            "siren": str(siren),
-            "operatorRelation": {
-                "direction": "OUTBOUND"
-            }})
+        response = requests.put(
+            url,
+            headers=headers,
+            json={"siren": str(siren), "operatorRelation": {"direction": "OUTBOUND"}},
+        )
 
         try:
             response.raise_for_status()
