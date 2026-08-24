@@ -26,7 +26,7 @@ class API:
 
     def auth(self) -> tuple[str, datetime.datetime]:
         """Obtain (or reuse) a valid OAuth2 client-credentials token.
-        
+
         Returns:
             tuple: (access_token, token_expiration_date)
         """
