@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-import requests
-
 from iopole_api.exceptions.exception import IopoleApiException
 from iopole_api.models.api import API
 
@@ -21,18 +19,13 @@ class Factures(API):
         Raises:
             IopoleApiException: on any HTTP error response.
         """
-        headers = self.make_headers()
-        url = f"{self.base_url}/invoice"
-
-        with open(path, "rb") as invoice:
-            response = requests.post(url, headers=headers, files={"file": invoice})
-
         try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+            with open(path, "rb") as invoice:
+                response = self.call(method="POST", endpoint="invoice", files={"file": invoice})
+        except IopoleApiException as iopole_api_exception:
             raise IopoleApiException(
-                response.status_code, "The invoice was not sent to Iopole."
-            ) from e
+                iopole_api_exception.status_code, "The invoice was not sent to Iopole."
+            ) from iopole_api_exception
 
         invoice_id: str = response.json()["id"]
         return invoice_id
@@ -49,17 +42,14 @@ class Factures(API):
         Raises:
             IopoleApiException: on any HTTP error response.
         """
-        headers = self.make_headers()
-        url = f"{self.base_url}/invoice/{invoice_id}/download"
-
-        response = requests.get(url, headers=headers)
-
         try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+            response = self.call(
+                method="GET", endpoint=f"invoice/{invoice_id}/download", params={"invoice_id": invoice_id}
+            )
+        except IopoleApiException as iopole_api_exception:
             raise IopoleApiException(
-                response.status_code, "The invoice couldn't be retrieved from Iopole."
-            ) from e
+                iopole_api_exception.status_code, "The invoice couldn't be retrieved from Iopole."
+            ) from iopole_api_exception
 
         return response.content
 
@@ -75,18 +65,13 @@ class Factures(API):
         Raises:
             IopoleApiException: on any HTTP error response.
         """
-        headers = self.make_headers()
-        url = f"{self.base_url}/invoice/{invoice_id}/files"
-
-        response = requests.get(url, headers=headers)
-
         try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+            response = self.call(method="GET", endpoint=f"invoice/{invoice_id}/files")
+        except IopoleApiException as iopole_api_exception:
             raise IopoleApiException(
-                response.status_code,
+                iopole_api_exception.status_code,
                 "The invoice's metadata couldn't be retrieved from Iopole.",
-            ) from e
+            ) from iopole_api_exception
 
         result: list[Any] = response.json()
         return result

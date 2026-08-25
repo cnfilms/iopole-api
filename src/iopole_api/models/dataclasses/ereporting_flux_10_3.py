@@ -38,7 +38,5 @@ class ReportFlux10_3:
     def to_dict(self) -> dict[str, Any]:
         return {
             "transactionDate": self.transaction_date,
-            "transactions": [
-                transaction.to_dict() for transaction in self.transactions
-            ],
+            "transactions": [transaction.to_dict() for transaction in self.transactions],
         }

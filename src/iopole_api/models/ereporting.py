@@ -1,7 +1,5 @@
 from typing import Any
 
-import requests
-
 from iopole_api.exceptions.exception import IopoleApiException
 from iopole_api.models.api import API
 
@@ -19,19 +17,13 @@ class Ereporting(API):
         Raises:
             IopoleApiException: on any HTTP error response.
         """
-        headers = self.make_headers()
-        url = (
-            f"{self.base_url}/reporting/transaction/invoice/scheme/0002/value/{address}"
-        )
-
-        response = requests.post(url, headers=headers, data=report)
 
         try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+            self.call(method="POST", endpoint=f"reporting/transaction/invoice/scheme/0002/value/{address}", data=report)
+        except IopoleApiException as iopole_api_exception:
             raise IopoleApiException(
-                response.status_code, "The report was not sent to Iopole."
-            ) from e
+                iopole_api_exception.status_code, "The report was not sent to Iopole."
+            ) from iopole_api_exception
 
     def send_report_flux_10_3(self, report: dict[str, Any], address: str) -> None:
         """Submit an invoice for B2B e-reporting.
@@ -46,14 +38,9 @@ class Ereporting(API):
         Raises:
             IopoleApiException: on any HTTP error response.
         """
-        headers = self.make_headers()
-        url = f"{self.base_url}/reporting/transaction/scheme/0002/value/{address}"
-
-        response = requests.post(url, headers=headers, data=report)
-
         try:
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+            self.call(method="POST", endpoint=f"reporting/transaction/scheme/0002/value/{address}", data=report)
+        except IopoleApiException as iopole_api_exception:
             raise IopoleApiException(
-                response.status_code, "The report was not sent to Iopole."
-            ) from e
+                iopole_api_exception.status_code, "The report was not sent to Iopole."
+            ) from iopole_api_exception

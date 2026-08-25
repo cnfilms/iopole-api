@@ -168,8 +168,7 @@ class Invoice:
             raise ValueError("tax_details must have at least one entry")
         if self.invoice_due_date < self.invoice_date:
             raise ValueError(
-                f"invoice_due_date ({self.invoice_due_date}) must not be before "
-                f"invoiceDate ({self.invoice_date})"
+                f"invoice_due_date ({self.invoice_due_date}) must not be before invoiceDate ({self.invoice_date})"
             )
 
     def to_dict(self) -> dict[str, Any]:
