@@ -1,8 +1,8 @@
-from iopoleapi.models.enrollment import Enrollment
-from iopoleapi.models.ereporting import Ereporting
-from iopoleapi.models.factures import Factures
-from iopoleapi.models.societe import Societe
-from iopoleapi.models.status import Status
+from iopole_api.models.enrollment import Enrollment
+from iopole_api.models.ereporting import Ereporting
+from iopole_api.models.factures import Factures
+from iopole_api.models.societe import Societe
+from iopole_api.models.status import Status
 
 
 class IopoleAPI(Factures, Enrollment, Societe, Ereporting, Status):

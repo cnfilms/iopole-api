@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Any
+from typing import Any, Optional
 
 
 @dataclass
@@ -27,9 +27,7 @@ class Monetary:
 
     def __post_init__(self) -> None:
         if len(self.invoice_currency) != 3:
-            raise ValueError(
-                f"invoice_currency must be 3 chars, got {self.invoice_currency}"
-            )
+            raise ValueError(f"invoice_currency must be 3 chars, got {self.invoice_currency}")
 
     def to_dict(self) -> dict[str, Any]:
         return {

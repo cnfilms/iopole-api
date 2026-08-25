@@ -19,7 +19,7 @@ pip install iopole-api
 ## Quick start 🔧
 
 ```python
-from iopoleapi.client import IopoleAPI
+from iopole_api.client import IopoleAPI
 
 api = IopoleAPI(
     client_id="YOUR_CLIENT_ID",

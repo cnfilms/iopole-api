@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Any
+from typing import Any
 
-from iopoleapi.models.dataclasses.ereporting import Monetary, TaxDetail
+from iopole_api.models.dataclasses.ereporting import Monetary, TaxDetail
 
 
 class TransactionCategory(str, Enum):
@@ -19,7 +19,7 @@ class Transaction:
     category_code: TransactionCategory
     currency: str
     monetary: Monetary
-    tax_details: List[TaxDetail]
+    tax_details: list[TaxDetail]
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -33,12 +33,10 @@ class Transaction:
 @dataclass
 class ReportFlux10_3:
     transaction_date: str
-    transactions: List[Transaction]
+    transactions: list[Transaction]
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "transactionDate": self.transaction_date,
-            "transactions": [
-                transaction.to_dict() for transaction in self.transactions
-            ],
+            "transactions": [transaction.to_dict() for transaction in self.transactions],
         }
