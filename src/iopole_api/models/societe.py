@@ -5,8 +5,8 @@ from urllib.parse import urlencode
 
 import requests
 
-from iopoleapi.exceptions.exception import IopoleApiException
-from iopoleapi.models.api import API
+from iopole_api.exceptions.exception import IopoleApiException
+from iopole_api.models.api import API
 
 
 class Societe(API):

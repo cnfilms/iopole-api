@@ -4,7 +4,7 @@ import datetime
 
 import requests
 
-from iopoleapi.exceptions.exception import IopoleApiException
+from iopole_api.exceptions.exception import IopoleApiException
 
 
 class API:

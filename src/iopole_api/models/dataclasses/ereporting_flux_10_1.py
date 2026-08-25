@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Any
+from typing import Any
 
-from iopoleapi.models.dataclasses.ereporting import MonetaryAmount, Monetary, TaxDetail
+from iopole_api.models.dataclasses.ereporting import Monetary, MonetaryAmount, TaxDetail
 
 
 class InvoiceTypeCode(str, Enum):
@@ -53,8 +53,8 @@ class TaxPaymentUntdidCode(str, Enum):
 class TaxPaymentOption:
     """Exactly one of iopCode or code must be provided."""
 
-    iop_code: Optional[TaxPaymentIopCode] = None
-    code: Optional[TaxPaymentUntdidCode] = None
+    iop_code: TaxPaymentIopCode | None = None
+    code: TaxPaymentUntdidCode | None = None
 
     def __post_init__(self) -> None:
         if self.iop_code is None and self.code is None:
@@ -111,8 +111,8 @@ class Seller:
 class Buyer:
     identifier: PartyIdentifier
     postal_address: PostalAddress
-    name: Optional[str] = None
-    vat_number: Optional[str] = None
+    name: str | None = None
+    vat_number: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -125,12 +125,12 @@ class Buyer:
 
 @dataclass
 class InvoiceLine:
-    line_id: Optional[str] = None
-    description: Optional[str] = None
-    quantity: Optional[float] = None
-    unit_code: Optional[str] = None
-    net_amount: Optional[MonetaryAmount] = None
-    tax_percent: Optional[float] = None
+    line_id: str | None = None
+    description: str | None = None
+    quantity: float | None = None
+    unit_code: str | None = None
+    net_amount: MonetaryAmount | None = None
+    tax_percent: float | None = None
 
     def __post_init__(self) -> None:
         if self.tax_percent is not None and not 0 <= self.tax_percent <= 100:
@@ -156,10 +156,10 @@ class Invoice:
     process_type: ProcessType
     tax_payment_option: TaxPaymentOption
     monetary: Monetary
-    tax_details: List[TaxDetail]
+    tax_details: list[TaxDetail]
     seller: Seller
     buyer: Buyer
-    lines: Optional[List[InvoiceLine]] = None
+    lines: list[InvoiceLine] | None = None
 
     def __post_init__(self) -> None:
         if len(self.invoice_id) > 20:
