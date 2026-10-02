@@ -18,6 +18,8 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
+    "pytest>=8.4,<9",
+    "pytest-cov>=6.2,<7",
     "ruff>=0.15.9",
     "types-requests>=2.32.4.20260107",
 ]
@@ -30,3 +32,14 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=iopole_api --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=100"
+
+[tool.coverage.run]
+source = ["iopole_api"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
