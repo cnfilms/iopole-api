@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from iopole_api.models.dataclasses.ereporting import Monetary, MonetaryAmount, TaxDetail
 
 
-class InvoiceTypeCode(str, Enum):
+class InvoiceTypeCode(StrEnum):
     """UNTDID 1001 invoice type codes relevant to French e-reporting."""
 
     COMMERCIAL_INVOICE = "380"
@@ -18,7 +18,7 @@ class InvoiceTypeCode(str, Enum):
     SELF_BILLED_INVOICE = "389"
 
 
-class ProcessType(str, Enum):
+class ProcessType(StrEnum):
     """
     Business process type codes.
     B1/B2/B3 = B2Bi (FR seller → foreign buyer).
@@ -33,7 +33,7 @@ class ProcessType(str, Enum):
     S3 = "S3"  # Bi2B import / exemption
 
 
-class TaxPaymentIopCode(str, Enum):
+class TaxPaymentIopCode(StrEnum):
     """Iopole shorthand codes for VAT exigibility (when VAT becomes due)."""
 
     INVOICE_DATE = "INVOICE_DATE"  # VAT due on invoice date (default for goods)
@@ -41,7 +41,7 @@ class TaxPaymentIopCode(str, Enum):
     PAYMENT_DATE = "PAYMENT_DATE"  # VAT due on collection (services)
 
 
-class TaxPaymentUntdidCode(str, Enum):
+class TaxPaymentUntdidCode(StrEnum):
     """UNTDID 2005 — standard payment means timing codes."""
 
     INVOICE_DATE = "3"

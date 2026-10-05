@@ -34,17 +34,17 @@ api.auth()
 
 ## Available methods
 
-| Method | Description |
-|---|---|
-| `auth()` | Obtain / refresh the OAuth2 access token |
-| `send_invoice(path)` | Upload an invoice PDF; returns the Iopole invoice ID |
-| `get_invoice(invoice_id)` | Download the invoice file as `bytes` |
-| `get_invoice_metadata(invoice_id)` | Retrieve invoice metadata as a `list` |
-| `get_enrollment_link(siren)` | Return the onboarding URL for a company |
-| `get_electronic_addresses(siren)` | Return Peppol identifiers for a company |
-| `send_report_flux_10_1(report, address)` | Submit a B2B invoice e-report |
-| `send_report_flux_10_3(report, address)` | Submit a daily B2C transaction report |
-| `send_invoice_payment_status(uuid_presta, amount, vat_rate=0.0)` | Notify Iopole of an invoice payment |
+| Method                                                           | Description                                          |
+| ---------------------------------------------------------------- | ---------------------------------------------------- |
+| `auth()`                                                         | Obtain / refresh the OAuth2 access token             |
+| `send_invoice(path)`                                             | Upload an invoice PDF; returns the Iopole invoice ID |
+| `get_invoice(invoice_id)`                                        | Download the invoice file as `bytes`                 |
+| `get_invoice_metadata(invoice_id)`                               | Retrieve invoice metadata as a `list`                |
+| `get_enrollment_link(siren)`                                     | Return the onboarding URL for a company              |
+| `get_electronic_addresses(siren)`                                | Return Peppol identifiers for a company              |
+| `send_report_flux_10_1(report, address)`                         | Submit a B2B invoice e-report                        |
+| `send_report_flux_10_3(report, address)`                         | Submit a daily B2C transaction report                |
+| `send_invoice_payment_status(uuid_presta, amount, vat_rate=0.0)` | Notify Iopole of an invoice payment                  |
 
 ## Tests and coverage
 
@@ -53,14 +53,13 @@ uv sync --locked --group dev
 uv run pytest
 ```
 
-The tests mock HTTP requests, so no Iopole credentials or network access are needed.
-They cover every client endpoint, authentication, HTTP errors, and report serialization
-and validation. Each run measures line and branch coverage across the entire package,
-requires 100% coverage, and writes `coverage.xml`.
+The tests mock HTTP requests, so no Iopole credentials or network access are needed. They cover
+every client endpoint, authentication, HTTP errors, and report serialization and validation. Each
+run measures line and branch coverage across the entire package, requires 100% coverage, and writes
+`coverage.xml`.
 
-GitHub Actions runs the suite on Python 3.9 and 3.14 for pushes and pull requests.
-After a successful push to the default branch, CI uploads coverage to Codecov to
-update the badge. Enable `cnfilms/iopole-api` in Codecov once; the workflow uses
-[GitHub OIDC authentication](https://github.com/codecov/codecov-action#using-oidc)
-and does not require a `CODECOV_TOKEN` secret. The badge will show coverage after
-the first successful upload.
+GitHub Actions runs the suite on Python 3.9 and 3.14 for pushes and pull requests. After a
+successful push to the default branch, CI uploads coverage to Codecov to update the badge. Enable
+`cnfilms/iopole-api` in Codecov once; the workflow uses
+[GitHub OIDC authentication](https://github.com/codecov/codecov-action#using-oidc) and does not
+require a `CODECOV_TOKEN` secret. The badge will show coverage after the first successful upload.
