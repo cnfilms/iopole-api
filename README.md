@@ -33,12 +33,11 @@ api.auth()
 
 ## Available methods
 
-| Method | Description |
-|---|---|
-| `auth()` | Obtain / refresh the OAuth2 access token |
-| `send_invoice(path)` | Upload an invoice PDF; returns the Iopole invoice ID |
-| `get_invoice(invoice_id)` | Download the invoice file as `bytes` |
-| `get_invoice_metadata(invoice_id)` | Retrieve invoice metadata as a `list` |
-| `get_enrollment_link(siren)` | Return the onboarding URL for a company |
-| `get_electronic_addresses(siren)` | Return Peppol identifiers for a company |
-
+| Method                             | Description                                          |
+| ---------------------------------- | ---------------------------------------------------- |
+| `auth()`                           | Obtain / refresh the OAuth2 access token             |
+| `send_invoice(path)`               | Upload an invoice PDF; returns the Iopole invoice ID |
+| `get_invoice(invoice_id)`          | Download the invoice file as `bytes`                 |
+| `get_invoice_metadata(invoice_id)` | Retrieve invoice metadata as a `list`                |
+| `get_enrollment_link(siren)`       | Return the onboarding URL for a company              |
+| `get_electronic_addresses(siren)`  | Return Peppol identifiers for a company              |
