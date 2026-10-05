@@ -237,7 +237,7 @@ wheels = [
 
 [[package]]
 name = "iopole-api"
-version = "0.1.6"
+version = "1.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "requests" },
