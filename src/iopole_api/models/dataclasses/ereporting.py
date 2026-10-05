@@ -7,7 +7,7 @@ class MonetaryAmount:
     """An amount, optionally qualified with a currency."""
 
     amount: float
-    currency: Optional[str] = None
+    currency: str | None = None
 
     def __post_init__(self) -> None:
         if self.amount <= 0:

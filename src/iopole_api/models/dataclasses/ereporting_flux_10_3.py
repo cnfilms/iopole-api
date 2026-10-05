@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 
 from iopole_api.models.dataclasses.ereporting import Monetary, TaxDetail
 
 
-class TransactionCategory(str, Enum):
+class TransactionCategory(StrEnum):
     TLB1 = "TLB1"
     TPS1 = "TPS1"
     TNT1 = "TNT1"
