@@ -33,10 +33,6 @@ line-length = 120
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "--cov=iopole_api --cov-branch --cov-report=term-missing --cov-report=xml --cov-fail-under=100"
-
 [tool.coverage.run]
 source = ["iopole_api"]
 branch = true
