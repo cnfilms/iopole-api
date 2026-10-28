@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import Any
 
-from iopole_api.models.dataclasses.ereporting import Monetary, MonetaryAmount, TaxDetail
+from iopole_api.models.dataclasses.ereporting import Monetary, MonetaryAmount, TaxDetail, drop_none
 
 
 class InvoiceTypeCode(StrEnum):
@@ -19,26 +19,33 @@ class InvoiceTypeCode(StrEnum):
 
 
 class ProcessType(StrEnum):
-    """
-    Business process type codes.
-    B1/B2/B3 = B2Bi (FR seller → foreign buyer).
-    S1/S2/S3 = Bi2B (foreign seller → FR buyer).
+    """Cadre de facturation (BT-23), as accepted by Iopole.
+
+    B = biens, S = services, M = facture double (biens et services non accessoires).
     """
 
-    B1 = "B1"  # Standard B2Bi sale
-    B2 = "B2"  # B2Bi with reverse charge
-    B3 = "B3"  # B2Bi export / exemption
-    S1 = "S1"  # Standard Bi2B acquisition
-    S2 = "S2"  # Bi2B with reverse charge
-    S3 = "S3"  # Bi2B import / exemption
+    B1 = "B1"  # Dépôt d'une facture de biens
+    S1 = "S1"  # Dépôt d'une facture de services
+    M1 = "M1"  # Dépôt d'une facture double
+    B2 = "B2"  # Dépôt d'une facture déjà payée (biens)
+    S2 = "S2"  # Dépôt d'une facture déjà payée (services)
+    M2 = "M2"  # Dépôt d'une facture double déjà payée
+    S3 = "S3"  # Dépôt d'une facture de services à valider par un tiers
+    B4 = "B4"  # Dépôt d'une facture définitive après acompte (biens)
+    S4 = "S4"  # Dépôt d'une facture définitive après acompte (services)
+    M4 = "M4"  # Dépôt d'une facture double définitive après acompte
+    S5 = "S5"  # Dépôt par un sous-traitant
+    S6 = "S6"  # Dépôt par un cotraitant
+    B7 = "B7"  # Facture de biens déjà e-reportée (TVA déjà collectée)
+    S7 = "S7"  # Facture de services déjà e-reportée (TVA déjà collectée)
 
 
 class TaxPaymentIopCode(StrEnum):
     """Iopole shorthand codes for VAT exigibility (when VAT becomes due)."""
 
-    INVOICE_DATE = "INVOICE_DATE"  # VAT due on invoice date (default for goods)
-    DELIVERY_DATE = "DELIVERY_DATE"  # VAT due on delivery
-    PAYMENT_DATE = "PAYMENT_DATE"  # VAT due on collection (services)
+    INVOICE_DATE = "INVOICE_DATE"  # TVA sur les débits
+    DELIVERY_DATE = "DELIVERY_DATE"  # TVA à la livraison (biens)
+    PAYMENT_DATE = "PAYMENT_DATE"  # TVA sur les encaissements (services)
 
 
 class TaxPaymentUntdidCode(StrEnum):
@@ -65,15 +72,32 @@ class TaxPaymentOption:
     def to_dict(self) -> dict[str, Any]:
         if self.iop_code:
             return {"iopCode": self.iop_code}
-        return {"code": self.code}
+        # The UNTDID code is an integer in the Iopole schema
+        return {"code": int(self.code)}  # type: ignore[arg-type]
+
+
+class IdentifierScheme(StrEnum):
+    """ICD schemes used to identify parties in French e-reporting."""
+
+    SIREN = "0002"
+    SIRET = "0009"
+    EU_VAT_NUMBER = "0223"  # Entité UE hors France : numéro de TVA intracommunautaire
+    INDIVIDUAL = "0226"  # Particulier
+    NON_EU = "0227"  # Entité hors UE
+    RIDET = "0228"  # Nouvelle-Calédonie
+    TAHITI = "0229"  # Polynésie française
 
 
 @dataclass
 class PartyIdentifier:
     """ICD scheme + value pair."""
 
-    scheme: str  # ICD code, e.g. "0009"
+    scheme: str  # ICD code, e.g. "0002"
     value: str
+
+    def __post_init__(self) -> None:
+        if not self.value:
+            raise ValueError(f"identifier value is required (scheme {self.scheme})")
 
     def to_dict(self) -> dict[str, Any]:
         return {"scheme": self.scheme, "value": self.value}
@@ -88,23 +112,25 @@ class PostalAddress:
             raise ValueError(f"country must be 2 chars, got {self.country}")
 
     def to_dict(self) -> dict[str, Any]:
-        return {"country": self.country}
+        return {"country": self.country.upper()}
 
 
 @dataclass
 class Seller:
-    name: str
-    vat_number: str
     identifier: PartyIdentifier
     postal_address: PostalAddress
+    name: str | None = None
+    vat_number: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "name": self.name,
-            "vatNumber": self.vat_number,
-            "identifier": self.identifier.to_dict(),
-            "postalAddress": self.postal_address.to_dict(),
-        }
+        return drop_none(
+            {
+                "name": self.name,
+                "vatNumber": self.vat_number,
+                "identifier": self.identifier.to_dict(),
+                "postalAddress": self.postal_address.to_dict(),
+            }
+        )
 
 
 @dataclass
@@ -115,12 +141,14 @@ class Buyer:
     vat_number: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "identifier": self.identifier.to_dict(),
-            "postalAddress": self.postal_address.to_dict(),
-            "name": self.name,
-            "vatNumber": self.vat_number,
-        }
+        return drop_none(
+            {
+                "identifier": self.identifier.to_dict(),
+                "postalAddress": self.postal_address.to_dict(),
+                "name": self.name,
+                "vatNumber": self.vat_number,
+            }
+        )
 
 
 @dataclass
@@ -137,28 +165,31 @@ class InvoiceLine:
             raise ValueError(f"tax_percent must be 0–100, got {self.tax_percent}")
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "lineId": self.line_id,
-            "description": self.description,
-            "quantity": self.quantity,
-            "unitCode": self.unit_code,
-            "netAmount": self.net_amount.to_dict() if self.net_amount else {},
-            "taxPercent": float(self.tax_percent) if self.tax_percent else None,
-        }
+        return drop_none(
+            {
+                "lineId": self.line_id,
+                "description": self.description,
+                "quantity": self.quantity,
+                "unitCode": self.unit_code,
+                "netAmount": self.net_amount.to_dict() if self.net_amount else None,
+                "taxPercent": float(self.tax_percent) if self.tax_percent is not None else None,
+            }
+        )
 
 
 @dataclass
 class Invoice:
     invoice_id: str
     invoice_date: str
-    invoice_due_date: str
     invoice_type: InvoiceTypeCode
     process_type: ProcessType
-    tax_payment_option: TaxPaymentOption
     monetary: Monetary
     tax_details: list[TaxDetail]
     seller: Seller
     buyer: Buyer
+    # Omit when nothing remains due (e.g. invoice already paid)
+    invoice_due_date: str | None = None
+    tax_payment_option: TaxPaymentOption | None = None
     lines: list[InvoiceLine] | None = None
 
     def __post_init__(self) -> None:
@@ -166,24 +197,29 @@ class Invoice:
             raise ValueError(f"invoice_id max 20 chars, got {len(self.invoice_id)}")
         if not self.tax_details:
             raise ValueError("tax_details must have at least one entry")
-        if self.invoice_due_date < self.invoice_date:
+        if any(tax.code is None for tax in self.tax_details):
+            raise ValueError("every tax_details entry needs a VAT category code")
+        if self.invoice_due_date is not None and self.invoice_due_date < self.invoice_date:
             raise ValueError(
                 f"invoice_due_date ({self.invoice_due_date}) must not be before invoiceDate ({self.invoice_date})"
             )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "invoiceId": self.invoice_id,
-            "invoiceDate": self.invoice_date,
-            "invoiceDueDate": self.invoice_due_date,
-            "type": self.invoice_type,
-            "processType": self.process_type,
-            "taxPaymentOption": self.tax_payment_option.to_dict(),
-            "monetary": self.monetary.to_dict(),
-            "taxDetails": [tax.to_dict() for tax in self.tax_details],
-            "seller": self.seller.to_dict(),
-            "buyer": self.buyer.to_dict(),
-        }
+        return drop_none(
+            {
+                "invoiceId": self.invoice_id,
+                "invoiceDate": self.invoice_date,
+                "invoiceDueDate": self.invoice_due_date,
+                "type": self.invoice_type,
+                "processType": self.process_type,
+                "taxPaymentOption": self.tax_payment_option.to_dict() if self.tax_payment_option else None,
+                "monetary": self.monetary.to_dict(),
+                "taxDetails": [tax.to_dict() for tax in self.tax_details],
+                "seller": self.seller.to_dict(),
+                "buyer": self.buyer.to_dict(),
+                "lines": [line.to_dict() for line in self.lines] if self.lines else None,
+            }
+        )
 
 
 @dataclass
