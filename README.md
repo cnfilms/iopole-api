@@ -46,14 +46,17 @@ api.auth()
 
 Payloads are built with the dataclasses of `iopole_api.models.dataclasses` (`ReportFlux10_1` and
 `ReportFlux10_3`) and passed as `report.to_dict()`. Every `send_*` method accepts an optional
-`report_identifier` and returns the Iopole submission ID.
+`report_identifier` and returns the `transactionId` given back synchronously by Iopole (the
+transaction is then validated asynchronously, see the `EREPORTING_TRANSACTION_ATTACHED` / `EREPORTING_ERROR`
+webhook events). If Iopole accepts a submission without returning its identifier, `IopoleMissingIdException`
+is raised: the submission must not be sent again, flux 10.3 submissions being cumulative.
 
 | Method                                             | Description                              |
 | -------------------------------------------------- | ---------------------------------------- |
 | `send_report_flux_10_1(report, siren)`             | B2B international invoice / credit note  |
 | `send_report_flux_10_3(report, siren)`             | Daily summary of B2C transactions        |
-| `update_report_flux_10_1(transaction_id, report)`  | Replace an invoice transaction           |
-| `update_report_flux_10_3(transaction_id, report)`  | Replace a B2C transaction summary        |
+| `correct_report_flux_10_1(transaction_id, report)` | Correct an invoice transaction           |
+| `correct_report_flux_10_3(transaction_id, report)` | Correct a B2C transaction summary        |
 | `delete_report_transaction(transaction_id)`        | Delete a transaction (flux 10.1 / 10.3)  |
 | `search_reports(siren, **params)`                  | Search e-reporting folders over a period |
 | `get_report_transmission_content(transmission_id)` | Download the XML flux of a transmission  |
@@ -61,5 +64,4 @@ Payloads are built with the dataclasses of `iopole_api.models.dataclasses` (`Rep
 `search_reports` takes the Iopole query parameters: `from` (required) and `to` as `YYYY-MM`, `offset`, `limit`
 (pass `**{"from": "2026-09"}`, `from` being a Python keyword).
 
-> The `update_*` and `delete_*` endpoints are still under construction at Iopole and currently answer
-> `501 Not Implemented`.
+> The `DELETE` endpoint is planned by Iopole for V0.301 (mid-November 2026).

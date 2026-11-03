@@ -13,3 +13,13 @@ class IopoleApiException(Exception):
         error_text = self.ERROR_MESSAGES.get(status_code, "Unknown error")
         super().__init__(f"Iopole API (Error {status_code} - {error_text}): {msg}.")
         self.status_code = status_code
+
+
+class IopoleMissingIdException(IopoleApiException):
+    """Raised when Iopole accepted a submission (2xx) but did not return its identifier.
+
+    The submission must be considered as received by Iopole: sending it again would duplicate it.
+    """
+
+    def __init__(self, msg: str) -> None:
+        super().__init__(200, msg)
